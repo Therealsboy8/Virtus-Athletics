@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - Virtus Athletics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matte-black: #0A0A0A;
+            --slate-gray: #2D2D2D;
+            --iron-bronze: #8B6914;
+            --charcoal: #1A1A1A;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--matte-black);
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .community-bg {
+            background: linear-gradient(135deg, rgba(10,10,10,0.8) 0%, rgba(26,26,26,0.9) 100%),
+                        url('https://kimi-web-img.moonshot.cn/img/images.squarespace-cdn.com/7543626e6307373eecd6ecd8cbdd1f4787263afd.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #8B6914 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-primary {
+            background: var(--iron-bronze);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #A0781A;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 105, 20, 0.3);
+        }
+        
+        .btn-secondary {
+            border: 2px solid var(--iron-bronze);
+            color: var(--iron-bronze);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--iron-bronze);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .challenge-day {
+            background: var(--charcoal);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .challenge-day:hover {
+            border-color: var(--iron-bronze);
+            transform: scale(1.05);
+        }
+        
+        .challenge-day.completed {
+            background: var(--iron-bronze);
+            border-color: var(--iron-bronze);
+        }
+        
+        .challenge-day.current {
+            border-color: var(--iron-bronze);
+            box-shadow: 0 0 20px rgba(139, 105, 20, 0.3);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--iron-bronze);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--iron-bronze);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+        
+        .stagger-delay-1 { transition-delay: 0.1s; }
+        .stagger-delay-2 { transition-delay: 0.2s; }
+        .stagger-delay-3 { transition-delay: 0.3s; }
+        .stagger-delay-4 { transition-delay: 0.4s; }
+        .stagger-delay-5 { transition-delay: 0.5s; }
+        .stagger-delay-6 { transition-delay: 0.6s; }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--iron-bronze) 0%, #A0781A 100%);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .ambassador-card {
+            background: var(--charcoal);
+            border: 1px solid rgba(139, 105, 20, 0.1);
+            transition: all 0.4s ease;
+        }
+        
+        .ambassador-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(139, 105, 20, 0.2);
+            border-color: var(--iron-bronze);
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(135deg, var(--iron-bronze) 0%, #A0781A 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-gradient">VIRTUS</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link text-white hover:text-yellow-600 px-3 py-2 text-sm font-medium">Home</a>
+                        <a href="shop.html" class="nav-link text-white hover:text-yellow-600 px-3 py-2 text-sm font-medium">Shop</a>
+                        <a href="community.html" class="nav-link text-yellow-600 px-3 py-2 text-sm font-medium">Community</a>
+                        <a href="index.html#about" class="nav-link text-white hover:text-yellow-600 px-3 py-2 text-sm font-medium">About</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-white hover:text-yellow-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h9a2 2 0 002-2v-6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Community Hero -->
+    <section class="community-bg min-h-screen flex items-center justify-center relative">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative z-10 text-center max-w-4xl mx-auto px-4">
+            <h1 class="text-6xl md:text-8xl font-black mb-6 text-gradient">
+                Join the Movement
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                The Virtus 30-Day Challenge is more than a workout program – it's a commitment to excellence. 
+                Join thousands of athletes pushing their limits and earning their virtue daily.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="startChallenge" class="btn-primary px-8 py-4 rounded-lg text-lg font-semibold text-white">
+                    Start Your Challenge
+                </button>
+                <a href="#ambassadors" class="btn-secondary px-8 py-4 rounded-lg text-lg font-semibold">
+                    Meet Our Ambassadors
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenge Overview -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">30-Day Challenge</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Transform your body and mind in 30 days with our structured, progressive training program 
+                    designed for athletes at every level.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div class="text-center reveal stagger-delay-1">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-black rounded-full flex items-center justify-center">
+                        <span class="text-3xl font-bold text-yellow-600">30</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Daily Workouts</h3>
+                    <p class="text-gray-400">Structured exercises with progressive difficulty</p>
+                </div>
+                
+                <div class="text-center reveal stagger-delay-2">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-black rounded-full flex items-center justify-center">
+                        <svg class="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Community Support</h3>
+                    <p class="text-gray-400">Connect with thousands of motivated athletes</p>
+                </div>
+                
+                <div class="text-center reveal stagger-delay-3">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-black rounded-full flex items-center justify-center">
+                        <svg class="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Track Progress</h3>
+                    <p class="text-gray-400">Monitor your improvements with detailed analytics</p>
+                </div>
+            </div>
+            
+            <!-- Progress Stats -->
+            <div class="bg-black rounded-xl p-8 reveal">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <div class="text-3xl font-bold text-yellow-600 mb-2">12,847</div>
+                        <div class="text-gray-400">Active Members</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-yellow-600 mb-2">89%</div>
+                        <div class="text-gray-400">Completion Rate</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-yellow-600 mb-2">4.8</div>
+                        <div class="text-gray-400">Average Rating</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-yellow-600 mb-2">24/7</div>
+                        <div class="text-gray-400">Community Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenge Calendar -->
+    <section class="py-20 bg-black">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12 reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">Your Challenge Calendar</h2>
+                <p class="text-xl text-gray-300">Track your daily progress and earn achievements</p>
+            </div>
+            
+            <div class="bg-gray-900 rounded-xl p-8 reveal">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-2xl font-bold">October 2025</h3>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-yellow-600 rounded"></div>
+                            <span class="text-sm text-gray-400">Completed</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 border-2 border-yellow-600 rounded"></div>
+                            <span class="text-sm text-gray-400">Today</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calendar Grid -->
+                <div class="grid grid-cols-7 gap-2 mb-8">
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Sun</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Mon</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Tue</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Wed</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Thu</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Fri</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Sat</div>
+                    
+                    <!-- Calendar Days -->
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">1</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">2</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">3</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">4</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">5</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">6</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">7</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">8</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">9</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">10</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">11</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">12</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">13</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">14</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">15</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">16</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">17</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">18</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">19</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">20</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">21</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">22</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">23</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">24</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">25</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">26</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">27</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">28</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day completed rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">29</div>
+                        <div class="text-xs mt-1">✓</div>
+                    </div>
+                    <div class="challenge-day current rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">30</div>
+                        <div class="text-xs mt-1">Today</div>
+                    </div>
+                    <div class="challenge-day rounded-lg p-4 text-center text-sm">
+                        <div class="font-bold">31</div>
+                        <div class="text-xs mt-1">Rest</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">Overall Progress</h4>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-400 mb-2">
+                                <span>Completion</span>
+                                <span>97%</span>
+                            </div>
+                            <div class="bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar rounded-full h-2" style="width: 97%"></div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400">
+                            You're doing amazing! Only one more day to complete the challenge.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">Today's Workout</h4>
+                        <div class="bg-black rounded-lg p-4">
+                            <h5 class="font-semibold mb-2">Day 30: Final Test</h5>
+                            <ul class="text-sm text-gray-400 space-y-1">
+                                <li>• Max push-ups in 2 minutes</li>
+                                <li>• Max pull-ups to failure</li>
+                                <li>• 5-minute plank hold</li>
+                                <li>• 100 burpees for time</li>
+                            </ul>
+                            <button class="btn-primary px-4 py-2 rounded text-sm mt-4">
+                                Start Workout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Chart -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12 reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">Your Progress</h2>
+                <p class="text-xl text-gray-300">Visualize your strength gains over time</p>
+            </div>
+            
+            <div class="bg-black rounded-xl p-8 reveal">
+                <div id="progressChart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ambassadors Section -->
+    <section id="ambassadors" class="py-20 bg-black">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">Virtus Ambassadors</h2>
+                <p class="text-xl text-gray-300">Meet the athletes who inspire our community</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="ambassador-card rounded-xl p-6 reveal stagger-delay-1">
+                    <img src="resources/ambassador-1.jpg" alt="Marcus Rodriguez" class="w-full h-64 object-cover rounded-lg mb-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-bold">Marcus Rodriguez</h3>
+                        <span class="achievement-badge">ELITE</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Calisthenics World Champion</p>
+                    <p class="text-gray-300 text-sm mb-4">
+                        "Virtus taught me that true strength comes from consistency. Every day you show up, 
+                        even when you don't feel like it, you're building more than muscle – you're building character."
+                    </p>
+                    <div class="flex items-center justify-between text-sm text-gray-400">
+                        <span>5x Challenge Winner</span>
+                        <span>2.1M followers</span>
+                    </div>
+                </div>
+                
+                <div class="ambassador-card rounded-xl p-6 reveal stagger-delay-2">
+                    <img src="resources/ambassador-2.jpg" alt="Sarah Chen" class="w-full h-64 object-cover rounded-lg mb-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-bold">Sarah Chen</h3>
+                        <span class="achievement-badge">PRO</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Fitness Influencer & Coach</p>
+                    <p class="text-gray-300 text-sm mb-4">
+                        "The community aspect of Virtus keeps me motivated every single day. We're all in this together, 
+                        pushing each other to be better. That's the real power of this movement."
+                    </p>
+                    <div class="flex items-center justify-between text-sm text-gray-400">
+                        <span>3x Challenge Winner</span>
+                        <span>890K followers</span>
+                    </div>
+                </div>
+                
+                <div class="ambassador-card rounded-xl p-6 reveal stagger-delay-3">
+                    <img src="resources/ambassador-3.jpg" alt="David Thompson" class="w-full h-64 object-cover rounded-lg mb-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-bold">David Thompson</h3>
+                        <span class="achievement-badge">VETERAN</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Former Marine & Master Trainer</p>
+                    <p class="text-gray-300 text-sm mb-4">
+                        "Discipline is the foundation of everything I've achieved. Virtus represents that same 
+                        commitment to excellence that I learned in the military – applied to everyday life."
+                    </p>
+                    <div class="flex items-center justify-between text-sm text-gray-400">
+                        <span>7x Challenge Winner</span>
+                        <span>1.5M followers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Feed -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12 reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">Community Feed</h2>
+                <p class="text-xl text-gray-300">See how others are earning their virtue</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-black rounded-xl p-6 reveal stagger-delay-1">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/media-cldnry.s-nbcnews.com/0dc660f1354caf03d95f485a546bb72081987e0f.jpg" 
+                             alt="User" class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h4 class="font-semibold">@jessica_fitness</h4>
+                            <p class="text-sm text-gray-400">2 hours ago</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        "Just completed day 25 of the #EarnYourVirtus challenge! The plank progression has been 
+                        incredible for my core strength. Never thought I'd hold a 5-minute plank! 🔥"
+                    </p>
+                    <div class="flex items-center space-x-4 text-sm text-gray-400">
+                        <span>❤️ 124 likes</span>
+                        <span>💬 18 comments</span>
+                    </div>
+                </div>
+                
+                <div class="bg-black rounded-xl p-6 reveal stagger-delay-2">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.extremestudioperformance.com/640da63df576a6de1247f3e4e5facd128cfdefab.jpg" 
+                             alt="User" class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h4 class="font-semibold">@mike_calisthenics</h4>
+                            <p class="text-sm text-gray-400">4 hours ago</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        "The community support here is unmatched. When I was struggling on day 18, 
+                        everyone rallied to keep me going. That's what Virtus is all about! 💪"
+                    </p>
+                    <div class="flex items-center space-x-4 text-sm text-gray-400">
+                        <span>❤️ 89 likes</span>
+                        <span>💬 12 comments</span>
+                    </div>
+                </div>
+                
+                <div class="bg-black rounded-xl p-6 reveal stagger-delay-3">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/thekickhouse.com/03ed58424ba603f5fd1808346791682778a859bc.jpeg" 
+                             alt="User" class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h4 class="font-semibold">@sarah_strength</h4>
+                            <p class="text-sm text-gray-400">6 hours ago</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        "Day 30 tomorrow! Can't believe I made it this far. The discipline I've built 
+                        through this challenge has spilled over into every area of my life. Thank you Virtus! 🙏"
+                    </p>
+                    <div class="flex items-center space-x-4 text-sm text-gray-400">
+                        <span>❤️ 156 likes</span>
+                        <span>💬 24 comments</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="btn-primary px-8 py-3 rounded-lg font-semibold">
+                    View All Posts
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Join CTA -->
+    <section class="py-20 bg-black">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gradient">Ready to Earn Your Virtus?</h2>
+                <p class="text-xl text-gray-300 mb-8">
+                    Join thousands of athletes who have already transformed their lives. 
+                    Your journey to excellence starts today.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-yellow-600 mb-2">$0</div>
+                        <div class="text-gray-400">Free to Join</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-yellow-600 mb-2">30</div>
+                        <div class="text-gray-400">Days to Transform</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-yellow-600 mb-2">24/7</div>
+                        <div class="text-gray-400">Community Support</div>
+                    </div>
+                </div>
+                
+                <button id="joinChallenge" class="btn-primary px-12 py-4 rounded-lg text-xl font-semibold text-white">
+                    Start Your Challenge Today
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-8 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="mb-4">
+                <h3 class="text-2xl font-bold text-gradient">VIRTUS ATHLETICS</h3>
+            </div>
+            <p class="text-gray-400 text-sm">
+                © 2025 Virtus Athletics. All rights reserved. Elite is earned.
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
