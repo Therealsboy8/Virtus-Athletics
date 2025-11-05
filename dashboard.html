@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge Dashboard - Virtus Athletics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matte-black: #0A0A0A;
+            --slate-gray: #2D2D2D;
+            --iron-bronze: #8B6914;
+            --charcoal: #1A1A1A;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--matte-black);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #8B6914 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-primary {
+            background: var(--iron-bronze);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #A0781A;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 105, 20, 0.3);
+        }
+
+        .challenge-day {
+            background: var(--charcoal);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .challenge-day:hover {
+            border-color: var(--iron-bronze);
+            transform: scale(1.05);
+        }
+
+        .challenge-day.completed {
+            background: var(--iron-bronze);
+            border-color: var(--iron-bronze);
+        }
+
+        .challenge-day.current {
+            border-color: var(--iron-bronze);
+            box-shadow: 0 0 20px rgba(139, 105, 20, 0.3);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--iron-bronze) 0%, #A0781A 100%);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--iron-bronze);
+        }
+    </style>
+</head>
+<body>
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-gradient">VIRTUS</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link text-white hover:text-yellow-600 px-3 py-2 text-sm font-medium">Home</a>
+                        <a href="shop.html" class="nav-link text-white hover:text-yellow-600 px-3 py-2 text-sm font-medium">Shop</a>
+                        <a href="community.html" class="nav-link text-white hover:text-yellow-600 px-3 py-2 text-sm font-medium">Community</a>
+                        <a href="dashboard.html" class="nav-link text-yellow-600 px-3 py-2 text-sm font-medium">Dashboard</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="user-info text-sm text-gray-400 hidden"></span>
+                    <button id="signOutBtn" class="auth-required hidden text-gray-400 hover:text-yellow-600 text-sm">Sign Out</button>
+                    <a href="cart.html" class="text-white hover:text-yellow-600 transition-colors relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h9a2 2 0 002-2v-6"></path>
+                        </svg>
+                        <span class="cart-count absolute -top-2 -right-2 bg-yellow-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 text-gradient">Your Challenge</h1>
+                <p id="userGreeting" class="text-xl text-gray-300">Track your progress and earn your virtue</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-gray-900 rounded-xl p-6 text-center">
+                    <div class="text-4xl font-bold text-yellow-600 mb-2" id="currentDay">-</div>
+                    <div class="text-gray-400">Current Day</div>
+                </div>
+                <div class="bg-gray-900 rounded-xl p-6 text-center">
+                    <div class="text-4xl font-bold text-yellow-600 mb-2" id="completedDays">-</div>
+                    <div class="text-gray-400">Days Completed</div>
+                </div>
+                <div class="bg-gray-900 rounded-xl p-6 text-center">
+                    <div class="text-4xl font-bold text-yellow-600 mb-2" id="completionRate">-</div>
+                    <div class="text-gray-400">Completion Rate</div>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 rounded-xl p-8 mb-12">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Overall Progress</h2>
+                    <span id="progressPercentage" class="text-yellow-600 font-bold">0%</span>
+                </div>
+                <div class="bg-gray-700 rounded-full h-2 mb-4">
+                    <div id="progressBar" class="progress-bar rounded-full h-2" style="width: 0%"></div>
+                </div>
+                <p id="progressMessage" class="text-gray-400 text-sm">Start your journey today</p>
+            </div>
+
+            <div class="bg-black rounded-xl p-8 mb-12">
+                <h2 class="text-2xl font-bold mb-6">30-Day Calendar</h2>
+                <div class="grid grid-cols-7 gap-2 mb-8">
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Sun</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Mon</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Tue</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Wed</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Thu</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Fri</div>
+                    <div class="text-center text-sm font-semibold text-gray-400 py-2">Sat</div>
+                </div>
+
+                <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+            </div>
+
+            <div id="todayWorkout" class="bg-gray-900 rounded-xl p-8 mb-12 hidden">
+                <h2 class="text-2xl font-bold mb-6">Today's Workout</h2>
+                <div id="workoutDetails"></div>
+                <button id="completeWorkoutBtn" class="btn-primary px-8 py-3 rounded-lg font-semibold mt-6">
+                    Mark as Complete
+                </button>
+            </div>
+
+            <div class="bg-black rounded-xl p-8">
+                <h2 class="text-2xl font-bold mb-6">Your Progress Chart</h2>
+                <div id="progressChart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 py-8 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="mb-4">
+                <h3 class="text-2xl font-bold text-gradient">VIRTUS ATHLETICS</h3>
+            </div>
+            <p class="text-gray-400 text-sm">
+                © 2025 Virtus Athletics. All rights reserved. Elite is earned.
+            </p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import './supabase-client.js';
+        import './shopify.js';
+
+        let currentWorkout = null;
+        let progressData = [];
+        let workouts = [];
+
+        async function loadDashboard() {
+            if (!window.supabaseService.isAuthenticated()) {
+                window.location.href = 'auth.html?redirect=dashboard.html';
+                return;
+            }
+
+            if (!window.supabaseService.hasJoinedChallenge()) {
+                const result = await window.supabaseService.joinChallenge();
+                if (result.error) {
+                    alert('Error joining challenge. Please try again.');
+                    return;
+                }
+            }
+
+            await loadProgress();
+            await loadWorkouts();
+            renderDashboard();
+            renderCalendar();
+            renderTodayWorkout();
+            renderChart();
+        }
+
+        async function loadProgress() {
+            progressData = await window.supabaseService.getProgress();
+        }
+
+        async function loadWorkouts() {
+            workouts = await window.supabaseService.getWorkouts();
+        }
+
+        function renderDashboard() {
+            const participant = window.supabaseService.participant;
+            const completedCount = progressData.filter(p => p.completed).length;
+            const completionRate = Math.round((completedCount / 30) * 100);
+
+            document.getElementById('currentDay').textContent = participant.current_day;
+            document.getElementById('completedDays').textContent = completedCount;
+            document.getElementById('completionRate').textContent = `${completionRate}%`;
+            document.getElementById('progressPercentage').textContent = `${completionRate}%`;
+            document.getElementById('progressBar').style.width = `${completionRate}%`;
+
+            let message = 'Start your journey today';
+            if (completedCount === 0) {
+                message = 'Ready to start? Complete Day 1 now!';
+            } else if (completedCount < 10) {
+                message = 'Great start! Keep building momentum.';
+            } else if (completedCount < 20) {
+                message = 'You\'re in the zone! Don\'t stop now.';
+            } else if (completedCount < 30) {
+                message = 'Almost there! Push through to the finish.';
+            } else {
+                message = 'Congratulations! Challenge complete!';
+            }
+            document.getElementById('progressMessage').textContent = message;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const participant = window.supabaseService.participant;
+
+            for (let i = 1; i <= 30; i++) {
+                const progress = progressData.find(p => p.day_number === i);
+                const isCompleted = progress?.completed || false;
+                const isCurrent = i === participant.current_day;
+
+                const dayEl = document.createElement('div');
+                dayEl.className = `challenge-day rounded-lg p-4 text-center text-sm ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`;
+                dayEl.innerHTML = `
+                    <div class="font-bold">${i}</div>
+                    <div class="text-xs mt-1">${isCompleted ? '✓' : isCurrent ? 'Today' : ''}</div>
+                `;
+                dayEl.onclick = () => showDayDetails(i);
+                grid.appendChild(dayEl);
+            }
+        }
+
+        function renderTodayWorkout() {
+            const participant = window.supabaseService.participant;
+            const currentDay = participant.current_day;
+            const workout = workouts.find(w => w.day_number === currentDay);
+
+            if (!workout || currentDay > 30) {
+                document.getElementById('todayWorkout').classList.add('hidden');
+                return;
+            }
+
+            currentWorkout = workout;
+            document.getElementById('todayWorkout').classList.remove('hidden');
+
+            const exercises = JSON.parse(workout.exercises || '[]');
+            document.getElementById('workoutDetails').innerHTML = `
+                <h3 class="text-xl font-bold mb-2">Day ${workout.day_number}: ${workout.title}</h3>
+                <p class="text-gray-400 mb-4">${workout.description}</p>
+                <div class="mb-4">
+                    <span class="inline-block bg-yellow-600 text-black px-3 py-1 rounded-full text-xs font-semibold uppercase">${workout.difficulty}</span>
+                </div>
+                <ul class="space-y-2">
+                    ${exercises.map(ex => `<li class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>${ex.name} - ${ex.reps}</span>
+                    </li>`).join('')}
+                </ul>
+            `;
+        }
+
+        async function showDayDetails(dayNumber) {
+            const workout = workouts.find(w => w.day_number === dayNumber);
+            const progress = progressData.find(p => p.day_number === dayNumber);
+
+            if (!workout) return;
+
+            const exercises = JSON.parse(workout.exercises || '[]');
+            const status = progress?.completed ? 'Completed' : 'Not completed';
+
+            const message = `
+Day ${workout.day_number}: ${workout.title}
+
+Difficulty: ${workout.difficulty}
+Status: ${status}
+
+${workout.description}
+
+Exercises:
+${exercises.map(ex => `• ${ex.name} - ${ex.reps}`).join('\n')}
+            `;
+
+            alert(message);
+        }
+
+        function renderChart() {
+            const chartElement = document.getElementById('progressChart');
+            const chart = echarts.init(chartElement);
+
+            const completedByDay = progressData.map((p, idx) => {
+                const completed = progressData.slice(0, idx + 1).filter(pr => pr.completed).length;
+                return completed;
+            });
+
+            const option = {
+                backgroundColor: 'transparent',
+                title: {
+                    text: 'Daily Progress',
+                    textStyle: {
+                        color: '#ffffff',
+                        fontSize: 18
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: '#1A1A1A',
+                    borderColor: '#8B6914',
+                    textStyle: {
+                        color: '#ffffff'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`),
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2D2D2D'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#9CA3AF',
+                        interval: 4
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    max: 30,
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2D2D2D'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#9CA3AF'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#2D2D2D'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Completed Days',
+                    type: 'line',
+                    data: completedByDay,
+                    lineStyle: {
+                        color: '#8B6914'
+                    },
+                    itemStyle: {
+                        color: '#8B6914'
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [{
+                                offset: 0,
+                                color: 'rgba(139, 105, 20, 0.3)'
+                            }, {
+                                offset: 1,
+                                color: 'rgba(139, 105, 20, 0.1)'
+                            }]
+                        }
+                    }
+                }]
+            };
+
+            chart.setOption(option);
+
+            window.addEventListener('resize', () => {
+                chart.resize();
+            });
+        }
+
+        document.getElementById('completeWorkoutBtn')?.addEventListener('click', async function() {
+            if (!currentWorkout) return;
+
+            this.disabled = true;
+            this.textContent = 'Marking as complete...';
+
+            const result = await window.supabaseService.completeDay(currentWorkout.day_number);
+
+            if (result.error) {
+                alert('Error completing workout. Please try again.');
+                this.disabled = false;
+                this.textContent = 'Mark as Complete';
+                return;
+            }
+
+            alert('Workout completed! Great job!');
+            await loadProgress();
+            renderDashboard();
+            renderCalendar();
+            renderTodayWorkout();
+            renderChart();
+        });
+
+        document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+            await window.supabaseService.signOut();
+            window.location.href = 'index.html';
+        });
+
+        loadDashboard();
+    </script>
+</body>
+</html>
