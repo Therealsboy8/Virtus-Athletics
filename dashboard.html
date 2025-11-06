@@ -194,6 +194,17 @@
         let workouts = [];
 
         async function loadDashboard() {
+            const maxWaitTime = 5000;
+            const startTime = Date.now();
+
+            while (!window.supabaseService.initialized) {
+                if (Date.now() - startTime > maxWaitTime) {
+                    console.error('Timeout waiting for Supabase initialization');
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
             if (!window.supabaseService.isAuthenticated()) {
                 window.location.href = 'auth.html?redirect=dashboard.html';
                 return;
@@ -202,6 +213,7 @@
             if (!window.supabaseService.hasJoinedChallenge()) {
                 const result = await window.supabaseService.joinChallenge();
                 if (result.error) {
+                    console.error('Error joining challenge:', result.error);
                     alert('Error joining challenge. Please try again.');
                     return;
                 }

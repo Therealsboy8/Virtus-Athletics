@@ -670,7 +670,17 @@
     <script type="module">
         import './supabase-client.js';
 
-        document.getElementById('startChallenge')?.addEventListener('click', async function() {
+        async function handleChallengeClick() {
+            const maxWaitTime = 5000;
+            const startTime = Date.now();
+
+            while (!window.supabaseService.initialized) {
+                if (Date.now() - startTime > maxWaitTime) {
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
             if (!window.supabaseService.isAuthenticated()) {
                 window.location.href = 'auth.html?redirect=dashboard.html';
                 return;
@@ -686,25 +696,10 @@
                     window.location.href = 'dashboard.html';
                 }
             }
-        });
+        }
 
-        document.getElementById('joinChallenge')?.addEventListener('click', async function() {
-            if (!window.supabaseService.isAuthenticated()) {
-                window.location.href = 'auth.html?redirect=dashboard.html';
-                return;
-            }
-
-            if (window.supabaseService.hasJoinedChallenge()) {
-                window.location.href = 'dashboard.html';
-            } else {
-                const result = await window.supabaseService.joinChallenge();
-                if (result.error) {
-                    alert('Error joining challenge. Please try again.');
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-            }
-        });
+        document.getElementById('startChallenge')?.addEventListener('click', handleChallengeClick);
+        document.getElementById('joinChallenge')?.addEventListener('click', handleChallengeClick);
     </script>
 </body>
 </html>

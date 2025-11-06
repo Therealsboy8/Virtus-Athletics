@@ -6,6 +6,7 @@ class SupabaseService {
         this.supabase = null;
         this.currentUser = null;
         this.participant = null;
+        this.initialized = false;
         this.initialize();
     }
 
@@ -15,10 +16,17 @@ class SupabaseService {
 
         if (!supabaseUrl || !supabaseKey) {
             console.error('Supabase credentials not found');
+            this.initialized = true;
             return;
         }
 
-        this.supabase = createClient(supabaseUrl, supabaseKey);
+        this.supabase = createClient(supabaseUrl, supabaseKey, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true
+            }
+        });
+
         this.setupAuthListener();
         this.checkUser();
     }
@@ -30,6 +38,7 @@ class SupabaseService {
             if (event === 'SIGNED_IN') {
                 this.currentUser = session?.user || null;
                 this.loadParticipantData();
+                this.updateAuthUI();
             } else if (event === 'SIGNED_OUT') {
                 this.currentUser = null;
                 this.participant = null;
@@ -39,13 +48,23 @@ class SupabaseService {
     }
 
     async checkUser() {
-        if (!this.supabase) return;
-
-        const { data: { session } } = await this.supabase.auth.getSession();
-        if (session) {
-            this.currentUser = session.user;
-            await this.loadParticipantData();
+        if (!this.supabase) {
+            this.initialized = true;
+            this.updateAuthUI();
+            return;
         }
+
+        try {
+            const { data: { session }, error } = await this.supabase.auth.getSession();
+            if (session && session.user) {
+                this.currentUser = session.user;
+                await this.loadParticipantData();
+            }
+        } catch (error) {
+            console.error('Error checking user session:', error);
+        }
+
+        this.initialized = true;
         this.updateAuthUI();
     }
 

@@ -27,28 +27,26 @@ A premium athletic wear e-commerce website with an integrated 30-Day Challenge s
 
 ## Quick Start
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your Shopify and Supabase credentials
-   ```
-
-3. **Run development server:**
+1. **Run the development server:**
    ```bash
    npm run dev
    ```
 
-4. **Open in browser:**
+2. **Open in browser:**
    ```
    http://localhost:5173
    ```
 
-For detailed setup instructions, see [SETUP.md](SETUP.md)
+3. **Sign up** to join the 30-day challenge
+4. **Go to Dashboard** to start tracking your workouts
+5. **(Optional) Add Shopify credentials** to `.env` to enable shopping
+
+**See [RUN_PROJECT.md](RUN_PROJECT.md) for detailed instructions!**
+
+### Common Issues?
+- Pages not loading? → Make sure you're using `npm run dev`
+- Can't access dashboard? → Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+- Need setup help? → See [SETUP.md](SETUP.md)
 
 ## Pages
 
@@ -79,9 +77,29 @@ All configuration is done through environment variables:
 
 ## Documentation
 
-- [Setup Guide](SETUP.md) - Complete setup instructions
+- **[RUN_PROJECT.md](RUN_PROJECT.md)** - How to run and test the site (START HERE!)
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Fix common issues
+- **[SETUP.md](SETUP.md)** - Complete setup and configuration guide
+- **[QUICK_START.md](QUICK_START.md)** - 5-minute quick reference
 - [Design System](design.md) - Visual design guidelines
 - [Interaction Design](interaction.md) - UX patterns and flows
+
+## What's Fixed
+
+✅ **Page Routing** - All pages now accessible (Shop, Community, Dashboard, etc.)
+✅ **Authentication** - Session persists properly across page reloads
+✅ **Challenge Access** - Dashboard loads correctly after sign in
+✅ **Build Configuration** - Vite config handles multi-page routing
+
+## How It Works
+
+1. **You sign up** → Account created in Supabase
+2. **You join challenge** → Participant record created
+3. **Dashboard loads** → 30-day calendar displayed
+4. **Complete workouts** → Progress tracked in database
+5. **Add products** → Shopify products display in shop
+6. **Add to cart** → Items stored in browser
+7. **Checkout** → Redirects to Shopify checkout
 
 ## License
 
